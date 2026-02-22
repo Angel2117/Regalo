@@ -5,88 +5,29 @@
     <title>Para Vane 💫🫶🏻</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:italic,wght@600&display=swap" rel="stylesheet">
     <style>
-        body {
-            margin: 0;
-            background: #02050a;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        body { margin: 0; background: #02050a; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        canvas { position: absolute; transition: all 2s ease-in-out; z-index: 1; }
+        .canvas-shift { transform: translateX(-25%) scale(0.85); filter: blur(2px); opacity: 0.5; }
+        #ui-layer { position: absolute; bottom: 50px; z-index: 100; text-align: center; }
+        button { 
+            padding: 18px 45px; background: rgba(255, 215, 0, 0.05); color: #ffd700; 
+            border: 1px solid #ffd700; cursor: pointer; font-size: 13px; letter-spacing: 5px; 
+            text-transform: uppercase; transition: 0.5s; backdrop-filter: blur(10px);
         }
-        canvas {
-            position: absolute;
-            transition: all 2s cubic-bezier(0.6, 0, 0.4, 1);
-            z-index: 1;
+        button:hover { background: #ffd700; color: #000; box-shadow: 0 0 40px rgba(255, 215, 0, 0.4); }
+        #letter { 
+            position: absolute; right: -60%; width: 400px; height: 500px; background: #fffcf0; 
+            padding: 50px; box-shadow: -20px 0 80px rgba(0,0,0,0.8); transition: all 1.8s cubic-bezier(0.19, 1, 0.22, 1); 
+            z-index: 50; border-radius: 4px; opacity: 0;
         }
-        /* Efecto de desplazamiento para PC */
-        .canvas-shift {
-            transform: translateX(-25%) scale(0.9);
-            filter: brightness(0.5) blur(2px);
+        #letter.active { right: 8%; opacity: 1; }
+        .letter-content { 
+            color: #1a1a1a; font-family: 'Playfair Display', serif; font-size: 20px; 
+            line-height: 1.8; text-align: center; border: 1px solid rgba(178, 34, 34, 0.15); 
+            padding: 25px; height: 90%; display: flex; flex-direction: column; justify-content: center;
         }
-        #ui-layer {
-            position: absolute;
-            bottom: 50px;
-            z-index: 100;
-        }
-        button {
-            padding: 20px 50px;
-            background: rgba(255, 215, 0, 0.05);
-            color: #ffd700;
-            border: 1px solid #ffd700;
-            cursor: pointer;
-            font-size: 14px;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            transition: 0.5s;
-            backdrop-filter: blur(10px);
-        }
-        button:hover {
-            background: #ffd700;
-            color: #000;
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
-        }
-        /* Carta estilo PC (más grande y detallada) */
-        #letter {
-            position: absolute;
-            right: -50%;
-            width: 450px;
-            height: 550px;
-            background: #fffcf0;
-            padding: 60px;
-            box-shadow: -20px 0 80px rgba(0,0,0,0.8);
-            transition: all 1.8s cubic-bezier(0.19, 1, 0.22, 1);
-            z-index: 50;
-            border-radius: 2px;
-            opacity: 0;
-        }
-        #letter.active {
-            right: 10%;
-            opacity: 1;
-            transform: rotate(0deg);
-        }
-        .letter-content {
-            color: #1a1a1a;
-            font-family: 'Playfair Display', serif;
-            font-size: 22px;
-            line-height: 1.8;
-            text-align: center;
-            border: 1px solid rgba(178, 34, 34, 0.2);
-            padding: 30px;
-            height: 85%;
-        }
-        .letter-content h2 {
-            font-family: 'Dancing Script', cursive;
-            font-size: 45px;
-            color: #b22222;
-            margin: 0 0 20px 0;
-        }
-        .signature {
-            margin-top: 40px;
-            font-family: 'Dancing Script', cursive;
-            font-size: 28px;
-            color: #b22222;
-        }
+        h2 { font-family: 'Dancing Script', cursive; font-size: 40px; color: #b22222; margin: 0 0 15px 0; }
+        .signature { margin-top: 30px; font-family: 'Dancing Script', cursive; font-size: 26px; color: #b22222; }
     </style>
 </head>
 <body>
@@ -116,84 +57,74 @@ function init() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
     particles = [];
-    // 1500 partículas para un árbol súper denso
-    for (let i = 0; i < 1500; i++) {
+    // 1200 partículas para densidad perfecta
+    for (let i = 0; i < 1200; i++) {
         particles.push({
-            angle: i * 0.1,
-            speed: 0.005 + Math.random() * 0.01,
-            color: i % 10 === 0 ? '#ffffff' : (i % 6 === 0 ? '#ffd700' : '#145c32'),
-            size: Math.random() * 2 + 0.5,
-            yOff: i
+            angle: i * 0.15,
+            speed: 0.007 + Math.random() * 0.01,
+            color: i % 12 === 0 ? '#ffffff' : (i % 8 === 0 ? '#ffd700' : '#145c32'),
+            size: Math.random() * 1.8 + 0.5
         });
     }
-    stars = Array.from({length: 200}, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.2 }));
+    stars = Array.from({length: 150}, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.2 }));
 }
 
 function draw() {
-    ctx.fillStyle = '#02050a';
+    ctx.fillStyle = '#01050a';
     ctx.fillRect(0, 0, w, h);
 
-    // Fondo estelar profundo
+    // Fondo estelar
     ctx.fillStyle = "white";
-    stars.forEach(s => {
-        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7); ctx.fill();
-    });
+    stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7); ctx.fill(); });
 
-    const cx = w / 2, cy = h * 0.85, treeH = h * 0.7;
+    const cx = w / 2, cy = h * 0.85, treeH = h * 0.65;
 
-    // TRONCO CON TEXTURA
-    const trunkW = 40;
-    const grd = ctx.createLinearGradient(cx - 20, cy, cx + 20, cy);
-    grd.addColorStop(0, '#120a02'); grd.addColorStop(0.5, '#3d240d'); grd.addColorStop(1, '#120a02');
+    // TRONCO (Ancho fijo para que no se deforme)
+    const trunkW = 30;
+    const grd = ctx.createLinearGradient(cx - 15, cy, cx + 15, cy);
+    grd.addColorStop(0, '#0a0500'); grd.addColorStop(0.5, '#42240c'); grd.addColorStop(1, '#0a0500');
     ctx.fillStyle = grd;
-    ctx.fillRect(cx - trunkW/2, cy, trunkW, 60);
+    ctx.fillRect(cx - trunkW/2, cy, trunkW, 50);
 
-    // CUERPO DEL ÁRBOL
+    // ÁRBOl (Con radio limitado para mantener forma de pino)
     particles.forEach((p, i) => {
         const ratio = i / particles.length;
-        const radius = (1 - ratio) * 250;
+        // Limitamos el radio máximo a 220px para que no se vea aplastado
+        const radius = (1 - ratio) * 220; 
         const y = cy - (ratio * treeH);
         const x = cx + Math.sin(p.angle) * radius;
-        const z = Math.cos(p.angle) * radius;
-        const scale = (z + 250) / 500;
+        const scale = (Math.cos(p.angle) + 1.5) / 2.5;
 
-        ctx.shadowBlur = 15 * scale;
+        ctx.shadowBlur = 12 * scale;
         ctx.shadowColor = p.color;
         ctx.fillStyle = p.color;
-        ctx.beginPath(); ctx.arc(x, y, p.size * (scale + 0.5), 0, 7); ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, p.size * scale, 0, 7); ctx.fill();
         ctx.shadowBlur = 0;
         p.angle += p.speed;
     });
 
-    // ESTRELLA DE CINE
-    drawGoldStar(cx, cy - treeH - 35);
-
+    // ESTRELLA (Proporcional al árbol)
+    drawStar(cx, cy - treeH - 30);
     requestAnimationFrame(draw);
 }
 
-function drawGoldStar(x, y) {
+function drawStar(x, y) {
     ctx.save();
-    ctx.shadowBlur = 50; ctx.shadowColor = "#ffd700";
+    ctx.shadowBlur = 40; ctx.shadowColor = "#ffd700";
     ctx.fillStyle = "#ffd700";
     ctx.beginPath();
     for(let i=0; i<16; i++) {
-        let r = i % 2 === 0 ? 30 : 12;
+        let r = i % 2 === 0 ? 25 : 10;
         let a = i * Math.PI / 8 - Math.PI / 2;
         ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
     }
-    ctx.closePath(); ctx.fill();
-    
-    // Núcleo brillante
-    ctx.fillStyle = "white";
-    ctx.beginPath(); ctx.arc(x, y, 6, 0, 7); ctx.fill();
+    ctx.fill();
+    ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(x, y, 4, 0, 7); ctx.fill();
     ctx.restore();
 }
 
 function openMessage() {
-    const audio = document.getElementById('bgMusic');
-    audio.volume = 0.5;
-    audio.play();
-    
+    document.getElementById('bgMusic').play();
     canvas.classList.add('canvas-shift');
     document.getElementById('letter').classList.add('active');
     document.getElementById('mainBtn').style.opacity = '0';
