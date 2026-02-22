@@ -1,3 +1,122 @@
-{
-	"folders": []
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para Vane 💫</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:italic,wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #e5c06d; --accent: #b22222; --bg: #020812; }
+        body { margin: 0; background: var(--bg); overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; width: 100vw; }
+        
+        canvas { position: absolute; top: 0; left: 0; transition: all 1.2s ease-in-out; z-index: 1; width: 100%; height: 100%; }
+        .canvas-shift { transform: scale(0.7) translateY(-20%); filter: blur(3px); opacity: 0.3; }
+
+        #ui-layer { position: absolute; bottom: 15%; z-index: 100; width: 100%; text-align: center; }
+        
+        button { 
+            padding: 15px 35px; 
+            background: rgba(229, 192, 109, 0.1); 
+            color: var(--gold); 
+            border: 1px solid var(--gold); 
+            font-size: 12px;
+            letter-spacing: 3px; 
+            border-radius: 50px; 
+            backdrop-filter: blur(10px);
+            text-transform: uppercase;
+        }
+
+        #letter { 
+            position: absolute; 
+            top: 50%; left: 50%;
+            transform: translate(-50%, 150%);
+            width: 85%; 
+            max-width: 320px; 
+            background: #fffef0; 
+            padding: 30px; 
+            box-shadow: 0 10px 50px rgba(0,0,0,0.8); 
+            transition: all 1.2s cubic-bezier(0.17, 0.67, 0.83, 0.67); 
+            z-index: 150; 
+            opacity: 0; 
+            border-radius: 12px;
+        }
+
+        #letter.active { transform: translate(-50%, -50%); opacity: 1; }
+
+        .letter-content { color: #2c3e50; font-family: 'Playfair Display', serif; text-align: center; }
+        .letter-content h2 { font-family: 'Dancing Script', cursive; font-size: 28px; color: var(--accent); margin: 0 0 15px 0; }
+        .signature { margin-top: 20px; font-weight: bold; color: var(--accent); font-family: 'Dancing Script', cursive; font-size: 22px; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop><source src="Dreams.mp3" type="audio/mpeg"></audio>
+    <canvas id="treeCanvas"></canvas>
+
+    <div id="ui-layer">
+        <button onclick="start()">DESCUBRIR REGALO</button>
+    </div>
+
+    <div id="letter">
+        <div class="letter-content">
+            <h2>Para Vane 💫🫶🏻</h2>
+            <p>Vane, gracias por llegar a mi vida. Has cambiado todo en mí y cada momento a tu lado es mejor. Gracias por ser esa luz.</p>
+            <div class="signature">De mí para ti</div>
+        </div>
+    </div>
+
+<script>
+const canvas = document.getElementById('treeCanvas');
+const ctx = canvas.getContext('2d');
+let w, h, particles = [], snow = [];
+
+function init() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    particles = [];
+    for (let i = 0; i < 600; i++) {
+        particles.push({
+            h: i, angle: i * 0.2,
+            speed: 0.008 + Math.random() * 0.01,
+            color: i % 12 === 0 ? '#ffda85' : '#10b981',
+            size: Math.random() * 1.5
+        });
+    }
+    snow = Array.from({length: 60}, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 2, s: 1 }));
 }
+
+function draw() {
+    ctx.fillStyle = '#020812'; ctx.fillRect(0, 0, w, h);
+    const cx = w / 2, cy = h * 0.8, tH = h * 0.55;
+
+    snow.forEach(p => {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill();
+        p.y += p.s; if (p.y > h) p.y = -10;
+    });
+
+    ctx.fillStyle = '#1a0d02'; ctx.fillRect(cx - 10, cy, 20, 30);
+
+    particles.forEach((p, i) => {
+        const r = i / particles.length;
+        const rad = (1 - r) * (w * 0.4);
+        const y = cy - (r * tH), x = cx + Math.cos(p.angle) * rad;
+        ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(x, y, p.size, 0, 7); ctx.fill();
+        p.angle += p.speed;
+    });
+
+    requestAnimationFrame(draw);
+}
+
+function start() {
+    document.getElementById('bgMusic').play();
+    document.getElementById('ui-layer').style.display = 'none';
+    canvas.classList.add('canvas-shift');
+    document.getElementById('letter').classList.add('active');
+}
+
+window.addEventListener('resize', init);
+init(); draw();
+</script>
+</body>
+</html>
