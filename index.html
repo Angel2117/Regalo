@@ -2,51 +2,91 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Para Vane 💫🫶🏻</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:italic,wght@600&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #ffd700; --white: #ffffff; --green: #0f5132; --bg: #050a14; }
-        body { margin: 0; background: var(--bg); overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        
-        canvas { position: absolute; transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; }
-        .canvas-shift { transform: translateY(-20%) scale(0.8); filter: blur(3px); opacity: 0.3; }
-
-        #ui-layer { position: absolute; bottom: 20%; z-index: 100; width: 100%; text-align: center; }
-        
-        button { 
-            padding: 16px 40px; 
-            background: rgba(255, 215, 0, 0.1); 
-            color: var(--gold); 
-            border: 1.5px solid var(--gold); 
-            cursor: pointer; 
-            font-family: 'Montserrat', sans-serif;
-            font-size: 12px;
-            letter-spacing: 4px; 
-            border-radius: 4px; 
-            backdrop-filter: blur(8px);
+        body {
+            margin: 0;
+            background: #02050a;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            position: absolute;
+            transition: all 2s cubic-bezier(0.6, 0, 0.4, 1);
+            z-index: 1;
+        }
+        /* Efecto de desplazamiento para PC */
+        .canvas-shift {
+            transform: translateX(-25%) scale(0.9);
+            filter: brightness(0.5) blur(2px);
+        }
+        #ui-layer {
+            position: absolute;
+            bottom: 50px;
+            z-index: 100;
+        }
+        button {
+            padding: 20px 50px;
+            background: rgba(255, 215, 0, 0.05);
+            color: #ffd700;
+            border: 1px solid #ffd700;
+            cursor: pointer;
+            font-size: 14px;
+            letter-spacing: 5px;
             text-transform: uppercase;
+            transition: 0.5s;
+            backdrop-filter: blur(10px);
         }
-
-        #letter { 
-            position: absolute; 
-            bottom: -100%; 
-            width: 85%; 
-            max-width: 350px; 
-            background: #fffef0; 
-            padding: 35px 25px; 
-            box-shadow: 0 10px 50px rgba(0,0,0,0.9); 
-            transition: all 1.2s cubic-bezier(0.2, 1, 0.3, 1); 
-            z-index: 150; 
-            border-radius: 8px;
+        button:hover {
+            background: #ffd700;
+            color: #000;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+        }
+        /* Carta estilo PC (más grande y detallada) */
+        #letter {
+            position: absolute;
+            right: -50%;
+            width: 450px;
+            height: 550px;
+            background: #fffcf0;
+            padding: 60px;
+            box-shadow: -20px 0 80px rgba(0,0,0,0.8);
+            transition: all 1.8s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 50;
+            border-radius: 2px;
+            opacity: 0;
+        }
+        #letter.active {
+            right: 10%;
+            opacity: 1;
+            transform: rotate(0deg);
+        }
+        .letter-content {
+            color: #1a1a1a;
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            line-height: 1.8;
             text-align: center;
+            border: 1px solid rgba(178, 34, 34, 0.2);
+            padding: 30px;
+            height: 85%;
         }
-
-        #letter.active { bottom: 15%; opacity: 1; transform: rotate(-1deg); }
-
-        .letter-content { color: #2c3e50; font-family: 'Montserrat', sans-serif; font-size: 16px; line-height: 1.8; }
-        .letter-content h2 { font-family: 'Dancing Script', cursive; font-size: 32px; color: #b22222; margin: 0 0 15px 0; }
-        .signature { margin-top: 25px; font-weight: bold; color: #b22222; font-family: 'Dancing Script', cursive; font-size: 24px; }
+        .letter-content h2 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 45px;
+            color: #b22222;
+            margin: 0 0 20px 0;
+        }
+        .signature {
+            margin-top: 40px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 28px;
+            color: #b22222;
+        }
     </style>
 </head>
 <body>
@@ -55,7 +95,7 @@
     <canvas id="treeCanvas"></canvas>
 
     <div id="ui-layer">
-        <button id="mainBtn" onclick="openGift()">Descubrir Regalo</button>
+        <button id="mainBtn" onclick="openMessage()">Descubrir Regalo</button>
     </div>
 
     <div id="letter">
@@ -75,87 +115,89 @@ let w, h, particles = [], stars = [];
 function init() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
-    
     particles = [];
-    for (let i = 0; i < 900; i++) {
+    // 1500 partículas para un árbol súper denso
+    for (let i = 0; i < 1500; i++) {
         particles.push({
-            index: i,
-            angle: i * 0.2,
+            angle: i * 0.1,
             speed: 0.005 + Math.random() * 0.01,
-            color: i % 15 === 0 ? '#ffffff' : (i % 7 === 0 ? '#ffd700' : '#1a4d2e'),
-            size: Math.random() * 1.8 + 0.5
+            color: i % 10 === 0 ? '#ffffff' : (i % 6 === 0 ? '#ffd700' : '#145c32'),
+            size: Math.random() * 2 + 0.5,
+            yOff: i
         });
     }
-    stars = Array.from({length: 80}, () => ({ x: Math.random() * w, y: Math.random() * h, s: Math.random() }));
+    stars = Array.from({length: 200}, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.2 }));
 }
 
 function draw() {
-    ctx.fillStyle = '#050a14';
+    ctx.fillStyle = '#02050a';
     ctx.fillRect(0, 0, w, h);
 
-    // Fondo estrellado
+    // Fondo estelar profundo
+    ctx.fillStyle = "white";
     stars.forEach(s => {
-        ctx.fillStyle = `rgba(255,255,255,${0.3 + Math.abs(Math.sin(Date.now()*0.001 + s.s))})`;
-        ctx.beginPath(); ctx.arc(s.x, s.y, 1, 0, 7); ctx.fill();
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7); ctx.fill();
     });
 
-    const cx = w / 2, cy = h * 0.85, treeH = h * 0.6;
+    const cx = w / 2, cy = h * 0.85, treeH = h * 0.7;
 
-    // EL TRONCO (Sólido y detallado)
-    const trunkW = 26, trunkH = 50;
-    const grd = ctx.createLinearGradient(cx - 13, cy, cx + 13, cy);
-    grd.addColorStop(0, '#1a0d00'); grd.addColorStop(0.5, '#4d2600'); grd.addColorStop(1, '#1a0d00');
+    // TRONCO CON TEXTURA
+    const trunkW = 40;
+    const grd = ctx.createLinearGradient(cx - 20, cy, cx + 20, cy);
+    grd.addColorStop(0, '#120a02'); grd.addColorStop(0.5, '#3d240d'); grd.addColorStop(1, '#120a02');
     ctx.fillStyle = grd;
-    ctx.fillRect(cx - trunkW/2, cy, trunkW, trunkH);
+    ctx.fillRect(cx - trunkW/2, cy, trunkW, 60);
 
-    // EL ÁRBOL (Partículas con Glow)
+    // CUERPO DEL ÁRBOL
     particles.forEach((p, i) => {
-        const r = i / particles.length;
-        const rad = (1 - r) * (w * 0.42);
-        const y = cy - (r * treeH);
-        const x = cx + Math.sin(p.angle) * rad;
-        
-        ctx.shadowBlur = 10; ctx.shadowColor = p.color;
+        const ratio = i / particles.length;
+        const radius = (1 - ratio) * 250;
+        const y = cy - (ratio * treeH);
+        const x = cx + Math.sin(p.angle) * radius;
+        const z = Math.cos(p.angle) * radius;
+        const scale = (z + 250) / 500;
+
+        ctx.shadowBlur = 15 * scale;
+        ctx.shadowColor = p.color;
         ctx.fillStyle = p.color;
-        ctx.beginPath(); ctx.arc(x, y, p.size, 0, 7); ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, p.size * (scale + 0.5), 0, 7); ctx.fill();
         ctx.shadowBlur = 0;
         p.angle += p.speed;
     });
 
-    // LA ESTRELLA (8 puntas, brillante)
-    drawXmasStar(cx, cy - treeH - 25);
+    // ESTRELLA DE CINE
+    drawGoldStar(cx, cy - treeH - 35);
 
     requestAnimationFrame(draw);
 }
 
-function drawXmasStar(x, y) {
+function drawGoldStar(x, y) {
     ctx.save();
-    ctx.shadowBlur = 35; ctx.shadowColor = "#ffd700";
+    ctx.shadowBlur = 50; ctx.shadowColor = "#ffd700";
     ctx.fillStyle = "#ffd700";
     ctx.beginPath();
-    for(let i = 0; i < 16; i++) {
-        let r = i % 2 === 0 ? 22 : 8;
+    for(let i=0; i<16; i++) {
+        let r = i % 2 === 0 ? 30 : 12;
         let a = i * Math.PI / 8 - Math.PI / 2;
         ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
     }
     ctx.closePath(); ctx.fill();
     
-    // Brillo central
+    // Núcleo brillante
     ctx.fillStyle = "white";
-    ctx.beginPath(); ctx.arc(x, y, 4, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, 6, 0, 7); ctx.fill();
     ctx.restore();
 }
 
-function openGift() {
+function openMessage() {
     const audio = document.getElementById('bgMusic');
-    audio.play().catch(() => {});
+    audio.volume = 0.5;
+    audio.play();
     
+    canvas.classList.add('canvas-shift');
+    document.getElementById('letter').classList.add('active');
     document.getElementById('mainBtn').style.opacity = '0';
-    setTimeout(() => {
-        canvas.classList.add('canvas-shift');
-        document.getElementById('letter').classList.add('active');
-        document.getElementById('mainBtn').style.display = 'none';
-    }, 400);
+    setTimeout(() => document.getElementById('mainBtn').style.display = 'none', 500);
 }
 
 window.addEventListener('resize', init);
