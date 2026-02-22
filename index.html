@@ -3,52 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Para Vane 💫</title>
+    <title>Para Vane 💫🫶🏻</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@300&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #e5c06d; --bg: #010816; }
+        :root { --gold: #ffd700; --white: #ffffff; --green: #0f5132; --bg: #050a14; }
         body { margin: 0; background: var(--bg); overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
         
-        canvas { position: absolute; transition: all 1.8s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; width: 100%; height: 100%; }
-        .canvas-shift { transform: translateY(-15%) scale(0.8); filter: blur(3px); opacity: 0.5; }
+        canvas { position: absolute; transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; }
+        .canvas-shift { transform: translateY(-20%) scale(0.8); filter: blur(3px); opacity: 0.3; }
 
-        #ui-layer { position: absolute; bottom: 25%; z-index: 100; text-align: center; width: 100%; }
+        #ui-layer { position: absolute; bottom: 20%; z-index: 100; width: 100%; text-align: center; }
         
         button { 
-            padding: 14px 35px; 
-            background: rgba(229, 192, 109, 0.05); 
+            padding: 16px 40px; 
+            background: rgba(255, 215, 0, 0.1); 
             color: var(--gold); 
-            border: 1px solid var(--gold); 
+            border: 1.5px solid var(--gold); 
             cursor: pointer; 
             font-family: 'Montserrat', sans-serif;
-            font-size: 11px;
-            font-weight: 300;
-            letter-spacing: 5px; 
-            border-radius: 2px; 
+            font-size: 12px;
+            letter-spacing: 4px; 
+            border-radius: 4px; 
             backdrop-filter: blur(8px);
-            transition: all 0.5s;
             text-transform: uppercase;
         }
 
         #letter { 
             position: absolute; 
             bottom: -100%; 
-            width: 80%; 
-            max-width: 320px; 
+            width: 85%; 
+            max-width: 350px; 
             background: #fffef0; 
-            padding: 40px 25px; 
+            padding: 35px 25px; 
             box-shadow: 0 10px 50px rgba(0,0,0,0.9); 
-            transition: all 1.5s cubic-bezier(0.19, 1, 0.22, 1); 
+            transition: all 1.2s cubic-bezier(0.2, 1, 0.3, 1); 
             z-index: 150; 
-            border-radius: 4px;
+            border-radius: 8px;
             text-align: center;
         }
 
-        #letter.active { bottom: 15%; opacity: 1; }
+        #letter.active { bottom: 15%; opacity: 1; transform: rotate(-1deg); }
 
-        .letter-content { color: #2c3e50; font-family: 'Montserrat', sans-serif; font-size: 15px; line-height: 1.8; }
-        .letter-content h2 { font-family: 'Dancing Script', cursive; font-size: 30px; color: #b22222; margin-bottom: 20px; }
-        .signature { margin-top: 25px; font-weight: bold; color: #b22222; font-family: 'Dancing Script', cursive; font-size: 22px; }
+        .letter-content { color: #2c3e50; font-family: 'Montserrat', sans-serif; font-size: 16px; line-height: 1.8; }
+        .letter-content h2 { font-family: 'Dancing Script', cursive; font-size: 32px; color: #b22222; margin: 0 0 15px 0; }
+        .signature { margin-top: 25px; font-weight: bold; color: #b22222; font-family: 'Dancing Script', cursive; font-size: 24px; }
     </style>
 </head>
 <body>
@@ -57,7 +55,7 @@
     <canvas id="treeCanvas"></canvas>
 
     <div id="ui-layer">
-        <button id="mainBtn" onclick="reveal()">Descubrir Regalo</button>
+        <button id="mainBtn" onclick="openGift()">Descubrir Regalo</button>
     </div>
 
     <div id="letter">
@@ -72,93 +70,85 @@
 <script>
 const canvas = document.getElementById('treeCanvas');
 const ctx = canvas.getContext('2d');
-let w, h, particles = [], stars_bg = [];
+let w, h, particles = [], stars = [];
 
 function init() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
     
-    // Partículas del árbol (Hélice densa)
     particles = [];
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 900; i++) {
         particles.push({
-            h: i,
-            angle: i * 0.1,
+            index: i,
+            angle: i * 0.2,
             speed: 0.005 + Math.random() * 0.01,
-            color: i % 15 === 0 ? '#ffffff' : (i % 8 === 0 ? '#ffda85' : '#10b981'),
-            size: Math.random() * 1.2
+            color: i % 15 === 0 ? '#ffffff' : (i % 7 === 0 ? '#ffd700' : '#1a4d2e'),
+            size: Math.random() * 1.8 + 0.5
         });
     }
-
-    // Estrellas de fondo
-    stars_bg = Array.from({length: 150}, () => ({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        size: Math.random() * 1.5,
-        o: Math.random()
-    }));
+    stars = Array.from({length: 80}, () => ({ x: Math.random() * w, y: Math.random() * h, s: Math.random() }));
 }
 
 function draw() {
-    ctx.fillStyle = '#010816';
+    ctx.fillStyle = '#050a14';
     ctx.fillRect(0, 0, w, h);
 
-    // Fondo estelar
-    stars_bg.forEach(s => {
-        ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(Math.sin(Date.now() * 0.001 + s.o * 10))})`;
-        ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, 7); ctx.fill();
+    // Fondo estrellado
+    stars.forEach(s => {
+        ctx.fillStyle = `rgba(255,255,255,${0.3 + Math.abs(Math.sin(Date.now()*0.001 + s.s))})`;
+        ctx.beginPath(); ctx.arc(s.x, s.y, 1, 0, 7); ctx.fill();
     });
 
-    const cx = w / 2, cy = h * 0.85, treeH = h * 0.65;
+    const cx = w / 2, cy = h * 0.85, treeH = h * 0.6;
 
-    // Tronco
-    const g = ctx.createLinearGradient(cx-10, cy, cx+10, cy);
-    g.addColorStop(0, '#0a0502'); g.addColorStop(0.5, '#2d1b0d'); g.addColorStop(1, '#0a0502');
-    ctx.fillStyle = g; ctx.fillRect(cx - 8, cy, 16, 40);
+    // EL TRONCO (Sólido y detallado)
+    const trunkW = 26, trunkH = 50;
+    const grd = ctx.createLinearGradient(cx - 13, cy, cx + 13, cy);
+    grd.addColorStop(0, '#1a0d00'); grd.addColorStop(0.5, '#4d2600'); grd.addColorStop(1, '#1a0d00');
+    ctx.fillStyle = grd;
+    ctx.fillRect(cx - trunkW/2, cy, trunkW, trunkH);
 
-    // Render del árbol
+    // EL ÁRBOL (Partículas con Glow)
     particles.forEach((p, i) => {
         const r = i / particles.length;
-        const rad = (1 - r) * (w * 0.4);
+        const rad = (1 - r) * (w * 0.42);
         const y = cy - (r * treeH);
         const x = cx + Math.sin(p.angle) * rad;
         
-        ctx.shadowBlur = 8; ctx.shadowColor = p.color;
+        ctx.shadowBlur = 10; ctx.shadowColor = p.color;
         ctx.fillStyle = p.color;
         ctx.beginPath(); ctx.arc(x, y, p.size, 0, 7); ctx.fill();
         ctx.shadowBlur = 0;
         p.angle += p.speed;
     });
 
-    // LA ESTRELLA (Añadida y sofisticada)
-    drawMainStar(cx, cy - treeH - 20);
+    // LA ESTRELLA (8 puntas, brillante)
+    drawXmasStar(cx, cy - treeH - 25);
 
     requestAnimationFrame(draw);
 }
 
-function drawMainStar(x, y) {
+function drawXmasStar(x, y) {
     ctx.save();
-    ctx.shadowBlur = 30; ctx.shadowColor = "#ffda85";
-    ctx.fillStyle = "#ffda85";
+    ctx.shadowBlur = 35; ctx.shadowColor = "#ffd700";
+    ctx.fillStyle = "#ffd700";
     ctx.beginPath();
-    for(let i=0; i<10; i++) {
-        let r = i % 2 === 0 ? 18 : 7;
-        let a = i * Math.PI / 5 - Math.PI / 2;
+    for(let i = 0; i < 16; i++) {
+        let r = i % 2 === 0 ? 22 : 8;
+        let a = i * Math.PI / 8 - Math.PI / 2;
         ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
     }
     ctx.closePath(); ctx.fill();
     
-    // Halo de la estrella
-    const pulse = 0.5 + Math.sin(Date.now() * 0.005) * 0.2;
-    ctx.fillStyle = `rgba(255, 218, 133, ${0.2 * pulse})`;
-    ctx.beginPath(); ctx.arc(x, y, 25, 0, 7); ctx.fill();
+    // Brillo central
+    ctx.fillStyle = "white";
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, 7); ctx.fill();
     ctx.restore();
 }
 
-function reveal() {
-    const music = document.getElementById('bgMusic');
-    music.volume = 0.6;
-    music.play().catch(e => console.log("Audio block"));
+function openGift() {
+    const audio = document.getElementById('bgMusic');
+    audio.play().catch(() => {});
     
     document.getElementById('mainBtn').style.opacity = '0';
     setTimeout(() => {
